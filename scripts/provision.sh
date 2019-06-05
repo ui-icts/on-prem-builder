@@ -20,7 +20,7 @@ sudo () {
 }
 
 init_datastore() {
-  mkdir -p /hab/svc/builder-datastore
+  mkdir -p /hab/user/builder-datastore/config
   cat <<EOT > /hab/user/builder-datastore/config/user.toml
 max_locks_per_transaction = 128
 dynamic_shared_memory_type = 'none'
@@ -54,14 +54,14 @@ configure() {
     ANALYTICS_COMPANY_NAME=""
   fi
 
-  mkdir -p /hab/svc/builder-minio
+  mkdir -p /hab/user/builder-minio/config
   cat <<EOT > /hab/user/builder-minio/config/user.toml
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
 EOT
 
-  mkdir -p /hab/svc/builder-api
+  mkdir -p /hab/user/builder-api/config
   if [ ${ARTIFACTORY_ENABLED:-false} = "true" ]; then
     FEATURES_ENABLED="ARTIFACTORY"
   else
@@ -116,7 +116,7 @@ password = "$PGPASSWORD"
 connection_timeout_sec = 5
 EOT
 
-  mkdir -p /hab/svc/builder-api-proxy
+  mkdir -p /hab/user/builder-api-proxy/config
   cat <<EOT > /hab/user/builder-api-proxy/config/user.toml
 log_level="info"
 enable_builder = false
@@ -140,6 +140,8 @@ keepalive_timeout = "180s"
 
 [server]
 listen_tls = $APP_SSL_ENABLED
+listen_port               = 8888
+listen_tls_port           = 4444
 
 [analytics]
 enabled = $ANALYTICS_ENABLED
