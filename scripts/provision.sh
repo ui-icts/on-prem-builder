@@ -21,7 +21,7 @@ sudo () {
 
 init_datastore() {
   mkdir -p /hab/svc/builder-datastore
-  cat <<EOT > /hab/svc/builder-datastore/user.toml
+  cat <<EOT > /hab/user/builder-datastore/config/user.toml
 max_locks_per_transaction = 128
 dynamic_shared_memory_type = 'none'
 
@@ -55,7 +55,7 @@ configure() {
   fi
 
   mkdir -p /hab/svc/builder-minio
-  cat <<EOT > /hab/svc/builder-minio/user.toml
+  cat <<EOT > /hab/user/builder-minio/config/user.toml
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
@@ -70,7 +70,7 @@ EOT
     ARTIFACTORY_API_KEY="none"
     ARTIFACTORY_REPO="habitat-builder-artifact-store"
   fi
-  cat <<EOT > /hab/svc/builder-api/user.toml
+  cat <<EOT > /hab/user/builder-api/config/user.toml
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
 
@@ -117,7 +117,7 @@ connection_timeout_sec = 5
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
-  cat <<EOT > /hab/svc/builder-api-proxy/user.toml
+  cat <<EOT > /hab/user/builder-api-proxy/config/user.toml
 log_level="info"
 enable_builder = false
 app_url = "${APP_URL}"
@@ -212,17 +212,6 @@ start_builder() {
   upload_ssl_certificate
 }
 
-if command -v useradd > /dev/null; then
-  sudo useradd --system --no-create-home hab || true
-else
-  sudo adduser --system hab || true
-fi
-if command -v groupadd > /dev/null; then
-  sudo groupadd --system hab || true
-else
-  sudo addgroup --system hab || true
-fi
-
-sudo systemctl start hab-sup
+sudo systemctl start hab-sup-default
 sleep 2
 start_builder
